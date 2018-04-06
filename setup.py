@@ -14,7 +14,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='eventmagic',
-    version='0.1.0',
+    version='0.1.1',
     description='Event scheduling for short-lived processes i.e. AWS Lambda',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -52,6 +52,7 @@ setup(
             'mock',
             'pytest',
             'pytest-cov',
+            'setuptools>=38.6.0',
             'sphinx==1.5.5',
             'twine',
             'wheel'
