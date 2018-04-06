@@ -34,6 +34,8 @@ test-coverage:
 	py.test --cov-report term-missing --cov-fail-under=85 --cov=eventmagic tests/
 
 build:
+	find ./dist/ -name '*.whl' -exec rm -f {} +
+	find ./dist/ -name '*.tar.gz' -exec rm -f {} +
 	python setup.py sdist
 	python setup.py bdist_wheel
 
