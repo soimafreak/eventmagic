@@ -27,7 +27,7 @@ class Schedule(object):
         self._when = kwargs.get("when")
         self._cron = kwargs.get("cron")
         self._id = kwargs.get("id")
-        self.uuid = kwargs.get("uuid", pyuuid.uuid4().hex)
+        self._uuid = kwargs.get("uuid", pyuuid.uuid4().hex)
         self._completed = kwargs.get("completed", False)
 
     def __str__(self):
