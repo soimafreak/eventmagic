@@ -50,6 +50,29 @@ class Event(object):
         self.uuid = kwargs.get("uuid", pyuuid.uuid4().hex)
         self._id = kwargs.get(id)
 
+    def __str__(self):
+        """Create a printed string."""
+        return "{\"execute_function\": {}, \"execute_params\": {}, \
+\"executed\": {}, \"executions\": {}, \"count\": {}, \"start_function\": {}, \
+\"start_params\": {}, \"started\": {} \"complete_function\": {}, \
+\"complete_params\": {}, \"completed\": {}, \"until_success\": {} \
+\"uuid\": {}, \"id\": {}}".format(
+            self.execute_function,
+            self.execute_params,
+            self.executed,
+            self.executions,
+            self.count,
+            self.start_function,
+            self.start_params,
+            self.started,
+            self.complete_function,
+            self.complete_params,
+            self.completed,
+            self.until_success,
+            self.uuid,
+            self._id
+        )
+
     @property
     def id(self):
         """Return the jobs."""
