@@ -1,7 +1,6 @@
 """Event Magic Package."""
 
 import logging
-import json
 import pickle
 import copy
 import mysql.connector
@@ -69,25 +68,26 @@ def bytecode_to_function(bytes):
 def event_to_tuple(e):
     """Convert an event in to a tuple."""
     if isinstance(e, Event):
-        logger.debug("Job is Event Instance")
+        logger.debug("Job is Event Instance: {}".format(e))
         # By Setting the id field of the tuple to NONE we do not need
         # to name every field when inserting them all
         tmp_tup = (
             None,
             function_to_bytecode(e.execute_function),
-            json.dumps(e.execute_params),
+            pickle.dumps(e.execute_params, protocol=pickle.HIGHEST_PROTOCOL),
             e.executed,
             e.executions,
             e.count,
             function_to_bytecode(e.start_function),
-            json.dumps(e.start_params),
+            pickle.dumps(e.start_params, protocol=pickle.HIGHEST_PROTOCOL),
             e.started,
             function_to_bytecode(e.complete_function),
-            json.dumps(e.complete_params),
+            pickle.dumps(e.complete_params, protocol=pickle.HIGHEST_PROTOCOL),
             e.completed,
             e.until_success,
             e.uuid
         )
+        logger.debug("TMP_TUP: {}".format(tmp_tup))
         return tmp_tup
     else:
         raise exceptions.JobIsNotAnEventObject
@@ -175,15 +175,15 @@ def get_event(event_id):
         row = cursor.fetchone()
         tmp_event = Event(
             bytecode_to_function(row[1]),
-            execute_params=json.loads(row[2]),
+            execute_params=pickle.loads(row[2]),
             executed=row[3],
             executions=row[4],
             count=row[5],
             start_function=bytecode_to_function(row[6]),
-            start_params=json.loads(row[7]),
+            start_params=pickle.loads(row[7]),
             started=row[8],
             complete_function=bytecode_to_function(row[9]),
-            complete_params=json.loads(row[10]),
+            complete_params=pickle.loads(row[10]),
             completed=row[11],
             until_success=row[12],
             uuid=row[13],
@@ -215,6 +215,7 @@ def save(schedules):
             schedule.completed
         )
         try:
+            logger.debug("Saving Schedule")
             cursor.execute(schedule_query, schedule_params)
             schedule_id = cursor.lastrowid
         except Exception as e:
@@ -254,6 +255,7 @@ def save(schedules):
                 return False
             try:
                 # Sets the event_id to the last row inserti id
+                logger.debug("Save the Job")
                 cursor.execute(job_query, (cursor.lastrowid, schedule_id))
             except Exception as e:
                 logger.error(

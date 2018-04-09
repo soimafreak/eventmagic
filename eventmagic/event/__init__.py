@@ -52,11 +52,11 @@ class Event(object):
 
     def __str__(self):
         """Create a printed string."""
-        return "{\"execute_function\": {}, \"execute_params\": {}, \
+        return "<\"execute_function\": {}, \"execute_params\": {}, \
 \"executed\": {}, \"executions\": {}, \"count\": {}, \"start_function\": {}, \
 \"start_params\": {}, \"started\": {} \"complete_function\": {}, \
 \"complete_params\": {}, \"completed\": {}, \"until_success\": {} \
-\"uuid\": {}, \"id\": {}}".format(
+\"uuid\": {}, \"id\": {}>".format(
             self.execute_function,
             self.execute_params,
             self.executed,
