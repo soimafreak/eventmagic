@@ -176,7 +176,8 @@ exception {}".format(value, e))
         logger.debug("NOW : {}".format(datetime.datetime.now()))
         # Execute ONLY if When is older than Now.
         if isinstance(self._when, datetime.date)\
-                and self._when <= datetime.datetime.now():
+                and self._when <= datetime.datetime.now()\
+                and not self._completed:
             for job in self._jobs:
                 if isinstance(job, Event):
                     logger.debug("Executing event, Job number {}".format(
