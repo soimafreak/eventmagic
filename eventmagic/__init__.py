@@ -199,6 +199,7 @@ def save(schedules):
     """
     conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
     cursor = conn.cursor()
+    logger.debug("Saving Schedules: {}".format(schedules))
     for schedule in schedules:
         tmp_jobs = list()
         logger.info("Saving schedule:")
@@ -263,14 +264,14 @@ def save(schedules):
                 conn.close()
                 return False
 
-        # Now everything has been inserted save the changes
-        # Close the specific query
-        cursor.close()
-        # Commit the result (if it was a data change)
-        conn.commit()
-        # Close the connection
-        conn.close()
-        return True
+    # Now everything has been inserted save the changes
+    # Close the specific query
+    cursor.close()
+    # Commit the result (if it was a data change)
+    conn.commit()
+    # Close the connection
+    conn.close()
+    return True
 
 
 def load():
