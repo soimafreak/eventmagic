@@ -48,14 +48,14 @@ class Event(object):
         self.completed = kwargs.get("completed", False)
         self.until_success = kwargs.get("until_success", False)
         self.uuid = kwargs.get("uuid", pyuuid.uuid4().hex)
-        self._id = kwargs.get(id)
+        self._id = kwargs.get("id")
 
     def __str__(self):
         """Create a printed string."""
         return "<\"execute_function\": {}, \"execute_params\": {}, \
 \"executed\": {}, \"executions\": {}, \"count\": {}, \"start_function\": {}, \
-\"start_params\": {}, \"started\": {} \"complete_function\": {}, \
-\"complete_params\": {}, \"completed\": {}, \"until_success\": {} \
+\"start_params\": {}, \"started\": {}, \"complete_function\": {}, \
+\"complete_params\": {}, \"completed\": {}, \"until_success\": {}, \
 \"uuid\": {}, \"id\": {}>".format(
             self.execute_function,
             self.execute_params,
