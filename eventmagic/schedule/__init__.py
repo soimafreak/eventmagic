@@ -206,7 +206,7 @@ exception {}".format(value, e))
                 if isinstance(self._cron, CronTab):
                     logger.info("Scheduling Next run")
                     self._when = datetime.datetime.now() + datetime.timedelta(
-                        self._cron.next(default_utc=False)
+                        seconds=self._cron.next(default_utc=False)
                     )
                     return True
                 elif self._cron is None:
