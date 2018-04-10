@@ -47,6 +47,15 @@ class JobNotFound(Exception):
     pass
 
 
+class JobHasNoId(Exception):
+    """Job has no ID."""
+
+    def __init__(self, message):
+        """General Events Error."""
+        self.message = message
+        logger.error(self.message)
+
+
 class GeneralEventsException(Exception):
     """No Function Defined Error."""
 
