@@ -15,7 +15,7 @@ CREATE TABLE `events` (
   `started` BOOLEAN,
   `complete_function` BLOB,
   `complete_params` BLOB,
-  `stopped` BOOLEAN,
+  `completed` BOOLEAN,
   `until_success` BOOLEAN,
   `uuid` CHAR(32)
 );
