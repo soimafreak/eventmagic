@@ -3,7 +3,7 @@
 Event magic is a simple scheduling / event management package aimed at services like AWS Lambda.
 Typically, Event scheduling applications rely on you creating objects and then running those in a loop, so a long running process. The issue then appears with Lambda that you need to be idempotent so you need to reload the events and make sure they executed losing any data like number of executions.
 
-To solve this, eventmagic can be run entirely in memory and has additional functionality to simply store and load the events from a mysql DB.
+To solve this, event magic can be run entirely in memory and has additional functionality to simply store and load the events from a mysql DB.
 
 Additionally event magic allows you to specify a function to execute before the main event and provides a range of 'complete' criteria tests, such as:
 * Until_success (Run for ever until it is successful),
@@ -19,6 +19,13 @@ Should it repeat X times or forever? What If it needs to repeat forever but only
 
 This module was written specifically to work (agnostically) on a FaaS platform (AWS Lambda for example).
 
+# Should I use Event Magic?
+
+Yes, If you have Lambdas in AWS and you need scheduling but do not want to set up Redis or create more lambdas and you already have a mysql DB then this is good.
+
+# Current State of Development
+
+Currently in alpha as it does not have all of the features I originally intended and there's some areas that need a drastic rework, such as the database interactions. Once all of the features are in place and I have implemented it fully in a.n.other product it will move to Beta. Production will be decided on usage. i.e. I don't wont to say it's production ready until it stops having odd issues. So either a period of time or a number of implementations (Please let me know if you are using it / need help just raise a ticket)
 
 # Setup
 
