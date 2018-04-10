@@ -136,7 +136,7 @@ def get_events_from_db(schedule_id):
 
     :param schedule_id: The schedule id of the schedule in the DB
     """
-    events_query = "select event_id from jobs where schedule_id = %s"
+    events_query = "SELECT event_id FROM jobs WHERE schedule_id = %s"
     conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
     cursor = conn.cursor()
     events = list()
@@ -166,7 +166,7 @@ def get_event(event_id):
     """
     conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
     cursor = conn.cursor()
-    event_query = "select * from events where id = %s"
+    event_query = "SELECT * FROM events WHERE id = %s"
     cursor.execute(event_query, (event_id, ))
     if not cursor.rowcount:
         logger.warning("No Event found")
@@ -192,6 +192,62 @@ def get_event(event_id):
         return tmp_event
 
 
+def update(schedule):
+    """Update the Schedule."""
+    logger.debug("Updating schedule rather than creating new")
+    conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
+    cursor = conn.cursor()
+    schedule_query = "UPDATE `schedules` SET `when`=%s, completed=%s \
+WHERE id=%s"
+    schedule_params = (
+        schedule.when,
+        schedule.completed,
+        schedule.id
+    )
+    try:
+        logger.info("Updating schedule {}".format(schedule.uuid))
+        cursor.execute(schedule_query, schedule_params)
+    except Exception as e:
+        logger.error("Updating schedule {} Failed. with error {}".format(
+            schedule.uuid, e
+        ))
+    for job in schedule.jobs:
+        # Test to make sure the job has an ID whcih it should
+        logger.debug("Updating job: {}".format(job))
+        if job.id:
+            event_query = "UPDATE `events` SET executed=%s, executions=%s, \
+count=%s, started=%s, stopped=%s where id = %s"
+            event_params = (
+                job.executed,
+                job.executions,
+                job.count,
+                job.started,
+                job.completed,
+                job.id
+            )
+            try:
+                logger.debug("Updating event")
+                cursor.execute(event_query, event_params)
+            except Exception as e:
+                logger.error("Updating event {} Failed. with error {}".format(
+                    job.uuid, e
+                ))
+        else:
+            raise exceptions.JobHasNoId(
+                "Can't update Job as it has not been saved to the DB before"
+            )
+    logger.info("committing changes to DB")
+    conn.commit()
+
+    logger.debug("All Done with Updating schedules, closing connection.")
+    # Now everything has been inserted save the changes
+    # Close the specific query
+    cursor.close()
+    # Close the connection
+    conn.close()
+    return True
+
+
 def save(schedules):
     """Save the schedules.
 
@@ -206,16 +262,26 @@ def save(schedules):
         logger.debug("UUID: {} TYPE: {}".format(
             schedule.uuid, type(schedule.uuid)
         ))
-        schedule_query = "INSERT INTO `schedules` VALUES(%s, %s, %s, %s, %s)"
-        schedule_params = (
-            None,
-            schedule.when,
-            pickle.dumps(schedule.cron, protocol=pickle.HIGHEST_PROTOCOL),
-            schedule.uuid,
-            schedule.completed
-        )
+        if schedule.id:
+            # Only has an schedule.id if it's been loaded from the DB
+            update(schedule)
+            continue
+        else:
+            schedule_query = "INSERT INTO `schedules` \
+VALUES(%s, %s, %s, %s, %s)"
+            schedule_params = (
+                None,
+                schedule.when,
+                pickle.dumps(schedule.cron, protocol=pickle.HIGHEST_PROTOCOL),
+                schedule.uuid,
+                schedule.completed
+            )
         try:
             logger.debug("Saving Schedule")
+            logger.debug("Query: {}, Params: {}".format(
+                schedule_query,
+                schedule_params
+            ))
             cursor.execute(schedule_query, schedule_params)
             schedule_id = cursor.lastrowid
         except Exception as e:
@@ -300,6 +366,7 @@ def load():
         logger.debug("Schedule is: {}".format(schedule))
         logger.debug("Schedule.id is: {}".format(schedule.id))
         logger.debug("Schedule.jobs: {}".format(schedule.jobs))
+        logger.debug("EVENT: {}".format(schedule.jobs[0]))
     logger.debug("Returning schedules: {}".format(schedules))
     return schedules
 
