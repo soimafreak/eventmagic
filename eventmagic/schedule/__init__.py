@@ -205,7 +205,9 @@ exception {}".format(value, e))
                 logger.debug("Checking if cron is an isntance of Crontab")
                 if isinstance(self._cron, CronTab):
                     logger.info("Scheduling Next run")
-                    self._when = self._cron.next(default_utc=False)
+                    self._when = datetime.datetime.now() + datetime.timedelta(
+                        self._cron.next(default_utc=False)
+                    )
                     return True
                 elif self._cron is None:
                     msg = "Jobs are not 'completed' but no crontab provided. \
