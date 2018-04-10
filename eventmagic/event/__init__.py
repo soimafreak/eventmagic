@@ -116,7 +116,7 @@ class Event(object):
             logger.debug("Start function is TYPE: {}".format(
                 type(self.start_function)
             ))
-            if self.start_function is None or self.start_function:
+            if self.start_function is None or self.start():
                 # Fail if start condition is set and returning false
                 if self.execute_function:
                     try:
@@ -142,7 +142,7 @@ class Event(object):
 
                     # Test to see if it should run one more time
                     if self.complete_function is not None \
-                            or self.complete_function:
+                            and self.complete():
                         self.completed = True
                     return response
                 else:
@@ -161,7 +161,15 @@ class Event(object):
         """Execute the start conditional function."""
         logger.debug("Run the start condition")
         if self.start_function:
-            response = self._run(self.start_function, self.start_params)
+            try:
+                response = self._run(self.start_function, self.start_params)
+            except Exception as e:
+                logger.error(
+                    "Error executing complete function: {} with the following \
+error {}".format(
+                        self.start_function.__name__, e
+                    )
+                )
             if response:
                 self.started = True
             else:
@@ -170,15 +178,25 @@ class Event(object):
             msg = "No Start function defined"
             raise exceptions.GeneralEventsException(msg)
 
-    def stop(self):
+    def complete(self):
         """Execute the stop conditional function."""
-        logger.info("Run the stop condition")
+        logger.info("Run the complete condition")
         if self.complete_function:
-            response = self._run(self.complete_function, self.complete_params)
+            try:
+                response = self._run(
+                    self.complete_function, self.complete_params
+                )
+            except Exception as e:
+                logger.error(
+                    "Error executing complete function: {} with the following \
+error {}".format(
+                        self.complete_function.__name__, e
+                    )
+                )
             if response:
                 self.completed = True
             else:
                 self.completed = False
         else:
-            msg = "No Stop function defined"
+            msg = "No Complete function defined"
             raise exceptions.GeneralEventsException(msg)
