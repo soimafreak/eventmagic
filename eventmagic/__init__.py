@@ -265,12 +265,15 @@ def save(schedules):
                 cursor.close()
                 conn.close()
                 return False
+        logger.debug("Schedule Saved")
+        # Commit the result (if it was a data change)
+        logger.info("committing changes to DB")
+        conn.commit()
 
+    logger.debug("All Done with Saving schedules, closing connection.")
     # Now everything has been inserted save the changes
     # Close the specific query
     cursor.close()
-    # Commit the result (if it was a data change)
-    conn.commit()
     # Close the connection
     conn.close()
     return True
