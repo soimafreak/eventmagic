@@ -170,10 +170,13 @@ error {}".format(
                         self.start_function.__name__, e
                     )
                 )
+            logger.debug("Start response is {}".format(response))
             if response:
                 self.started = True
+                return True
             else:
                 self.started = False
+                return False
         else:
             msg = "No Start function defined"
             raise exceptions.GeneralEventsException(msg)
@@ -193,10 +196,13 @@ error {}".format(
                         self.complete_function.__name__, e
                     )
                 )
+            logger.debug("Complete response is {}".format(response))
             if response:
                 self.completed = True
+                return True
             else:
                 self.completed = False
+                return False
         else:
             msg = "No Complete function defined"
             raise exceptions.GeneralEventsException(msg)
