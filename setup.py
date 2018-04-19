@@ -14,7 +14,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='eventmagic',
-    version='0.1.5',
+    version='0.1.6',
     description='Event scheduling with persistence for short-lived processes \
 i.e. AWS Lambda',
     long_description=long_description,
@@ -43,8 +43,7 @@ i.e. AWS Lambda',
     packages=find_packages(exclude=['contrib', 'docs', 'tests', 'example.py']),
     install_requires=[
         'crontab==0.22.0',
-        'mysql-connector-python==8.0.6',
-        'uuid'
+        'mysql-connector-python==8.0.6'
     ],
 
     extras_require={
