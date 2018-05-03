@@ -14,7 +14,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='eventmagic',
-    version='0.1.6',
+    version='0.1.7',
     description='Event scheduling with persistence for short-lived processes \
 i.e. AWS Lambda',
     long_description=long_description,

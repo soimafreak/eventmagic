@@ -382,9 +382,30 @@ def remove_schedule(schedules, schedule_uuid):
         logger.error(msg)
         raise exceptions.NoSchedulesProvided(msg)
     dupe_schedules = copy.deepcopy(schedules)
+    logger.debug("Created deep copy of schedules: {} and {}".format(
+        schedules, dupe_schedules
+    ))
     for schedule in dupe_schedules:
+        logger.debug("Checking Schedule {} for uuid: {}".format(
+            schedule, schedule_uuid
+        ))
         if schedule.uuid == schedule_uuid:
-            schedules.remove(schedule)
+            logger.info("Found Schedule in EventMagic")
+            try:
+                schedules.remove(schedule)
+            except ValueError as e:
+                logger.error(
+                    "This should not happen, tried to remove {} from ".format(
+                        schedule
+                    )
+                )
+                logger.debug(
+                    "By catching this error, the schedule can be removed from \
+the database so on the next run it won't run multiple times. If this is an \
+in-memory invocation it should not even have this issue..."
+                )
+                for i in schedules:
+                    logger.debug("Schedule: {}".format(i))
             if schedule.id:
                 # Has an Entry in the DB
                 for event in schedule.jobs:
