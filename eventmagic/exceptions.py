@@ -47,6 +47,12 @@ class JobNotFound(Exception):
     pass
 
 
+class EventAlreadyCompleted(Exception):
+    """Exception for when a Job is already completed prior to execution."""
+
+    pass
+
+
 class JobHasNoId(Exception):
     """Job has no ID."""
 

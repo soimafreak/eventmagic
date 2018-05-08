@@ -188,6 +188,13 @@ exception {}".format(value, e))
                             job.execute()
                         except exceptions.FailedToReturnBooleanValue:
                             return False
+                        except exceptions.GeneralEventsException as e:
+                            logger.debug("Caught General exception: {}".format(
+                                e
+                            ))
+                            return False
+                        except exceptions.EventAlreadyCompleted:
+                            logger.info("Event completed between executions")
                     else:
                         logger.debug(
                             "Skipping already completed Job {}".format(

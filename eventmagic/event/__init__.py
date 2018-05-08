@@ -115,9 +115,8 @@ execution the job has completed"
             # While another has not, so not all jobs in a schedule would have
             # Completed. This raises an error if a completed job is run as it
             # should be skipped
-            msg = "Event completed on a previous run"
-            logger.warning(msg)
-            raise exceptions.GeneralEventsException(msg)
+            logger.warning("Event completed on a previous run")
+            raise exceptions.EventAlreadyCompleted
         if self.count == 0 or self.executions < self.count:
             # Count is unset (or unlimited) or executions is less than count
             logger.debug("Start function is TYPE: {}".format(
