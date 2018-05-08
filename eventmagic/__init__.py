@@ -421,9 +421,9 @@ in-memory invocation it should not even have this issue..."
                     for job in i.jobs:
                         logger.debug("Jobs: {}".format(job))
                 for di in dupe_schedules:
-                    logger.debug("Dupe Schedule: {}".format(i))
+                    logger.debug("Dupe Schedule: {}".format(di))
                     for djob in di.jobs:
-                        logger.debug("Dupe Jobs: {}".format(job))
+                        logger.debug("Dupe Jobs: {}".format(djob))
 
             if schedule.id:
                 conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
