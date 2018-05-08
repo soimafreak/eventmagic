@@ -103,6 +103,13 @@ class Event(object):
     def execute(self):
         """Execute the event."""
         logger.info("Execute event")
+        logger.debug(
+            "Test to see if between the last execution and the current \
+execution the job has completed"
+        )
+        if self.complete_function is not None \
+                and self.complete():
+            self.completed = True
         if self.completed:
             # This is not necessarily a bad thing. One event may complete
             # While another has not, so not all jobs in a schedule would have
