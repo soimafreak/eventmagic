@@ -433,6 +433,7 @@ in-memory invocation it should not even have this issue..."
                 try:
                     logger.info("Removing schedule id: {}".format(schedule.id))
                     cursor.execute(delete_query, delete_params)
+                    conn.commit()
                     logger.debug('Deleted schedule: {}'.format(schedule.id))
                     # Has an Entry in the DB
                     for event in schedule.jobs:
@@ -461,6 +462,7 @@ def remove_event_from_db(event_id):
     try:
         logger.info("Removing event id: {}".format(event_id))
         cursor.execute(delete_query, delete_params)
+        conn.commit()
         logger.debug('Deleted Event: {}'.format(event_id))
     except Exception as e:
         logger.error(
