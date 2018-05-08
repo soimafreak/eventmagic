@@ -390,6 +390,9 @@ def remove_schedule(schedules, schedule_uuid):
         logger.error(msg)
         raise exceptions.NoSchedulesProvided(msg)
     dupe_schedules = copy.deepcopy(schedules)
+    logger.debug("Length of schedule is {} length of dupe is {}".format(
+        len(schedules), len(dupe_schedules)
+    ))
     logger.debug("Created deep copy of schedules: {} and {}".format(
         schedules, dupe_schedules
     ))
@@ -423,13 +426,6 @@ in-memory invocation it should not even have this issue..."
                         logger.debug("Dupe Jobs: {}".format(job))
 
             if schedule.id:
-                # Has an Entry in the DB
-                for event in schedule.jobs:
-                    if event.id:
-                        # If the event has an id it is also from the db
-                        # NB May not want to do this later if an event is
-                        # used by multiple schedules
-                        remove_event_from_db(event.id)
                 conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
                 cursor = conn.cursor()
                 delete_query = "DELETE FROM `schedules` WHERE id=%s;"
@@ -437,7 +433,15 @@ in-memory invocation it should not even have this issue..."
                 try:
                     logger.info("Removing schedule id: {}".format(schedule.id))
                     cursor.execute(delete_query, delete_params)
-                    logger.debug("Deleted {} Rows".format(cursor.rowcount))
+                    logger.debug('Deleted schedule: {}'.format(schedule.id))
+                    # Has an Entry in the DB
+                    for event in schedule.jobs:
+                        if event.id:
+                            # If the event has an id it is also from the db
+                            # NB May not want to do this later if an event is
+                            # used by multiple schedules
+                            logger.debug("Removing Event: {}".format(event.id))
+                            remove_event_from_db(event.id)
                 except Exception as e:
                     logger.error(
                         "Deleting Schedule failed with error: {}".format(e)
@@ -457,10 +461,9 @@ def remove_event_from_db(event_id):
     try:
         logger.info("Removing event id: {}".format(event_id))
         cursor.execute(delete_query, delete_params)
-        # Good chance this doesn't work...
-        logger.debug("Deleted {} Rows".format(cursor.rowcount))
+        logger.debug('Deleted Event: {}'.format(event_id))
     except Exception as e:
         logger.error(
-            "Deleting Schedule failed with error: {}".format(e)
+            "Deleting Events failed with error: {}".format(e)
         )
         raise exceptions.FailedToDeleteEvent(e)
