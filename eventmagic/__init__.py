@@ -26,6 +26,7 @@ def db_connection(host, port, username, password, database):
     :param username: the username to connect with
     :param password: the password to authenticate with
     """
+    logger.debug("Connecting to DB")
     cnx = mysql.connector.connect(
         user=username, password=password, host=host,
         port=port, database=database
@@ -95,19 +96,25 @@ def event_to_tuple(e):
 
 def get_schedules_from_db():
     """Get Schedules from DB."""
-    schedule_query = "SELECT * FROM `schedules`"
+    schedule_query = "SELECT * FROM `schedules`;"
     schedules = list()
+    logger.debug("Connecting to server: {}:{} with user {} using DB {}".format(
+        HOST, PORT, USERNAME, DATABASE
+    ))
     conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
     cursor = conn.cursor()
     logger.debug("Get the schedules from the DB")
     try:
+        logger.debug("executing query: {}".format(schedule_query))
         cursor.execute(schedule_query)
+        rows = cursor.fetchall()
+        logger.info("{} Schedules found".format(cursor.rowcount))
         if not cursor.rowcount:
             logger.warning("No schedules found")
             raise exceptions.NoSchedulesToLoad
         else:
-            logger.debug("Schedules found, Creatingschedule objects")
-            for row in cursor:
+            logger.debug("Schedules found, Creating schedule objects")
+            for row in rows:
                 # Create a schedule object
                 logger.debug("Creating schedule from row {}".format(row))
                 tmp_sched = Schedule(
@@ -136,7 +143,7 @@ def get_events_from_db(schedule_id):
 
     :param schedule_id: The schedule id of the schedule in the DB
     """
-    events_query = "SELECT event_id FROM jobs WHERE schedule_id = %s"
+    events_query = "SELECT event_id FROM jobs WHERE schedule_id = %s;"
     conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
     cursor = conn.cursor()
     events = list()
@@ -145,11 +152,12 @@ def get_events_from_db(schedule_id):
     ))
     try:
         cursor.execute(events_query, (schedule_id,))
+        rows = cursor.fetchall()
         if not cursor.rowcount:
             logger.warning("No Events found")
             raise exceptions.NoEventsToLoad
         else:
-            for row in cursor:
+            for row in rows:
                 # Create a schedule object
                 logger.debug("Result row is: {}".format(row))
                 events.append(get_event(row[0]))
@@ -166,13 +174,13 @@ def get_event(event_id):
     """
     conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
     cursor = conn.cursor()
-    event_query = "SELECT * FROM events WHERE id = %s"
+    event_query = "SELECT * FROM events WHERE id = %s;"
     cursor.execute(event_query, (event_id, ))
+    row = cursor.fetchone()
     if not cursor.rowcount:
         logger.warning("No Event found")
         raise exceptions.NoEventsToLoad
     else:
-        row = cursor.fetchone()
         tmp_event = Event(
             bytecode_to_function(row[1]),
             execute_params=pickle.loads(row[2]),
@@ -198,7 +206,7 @@ def update(schedule):
     conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
     cursor = conn.cursor()
     schedule_query = "UPDATE `schedules` SET `when`=%s, completed=%s \
-WHERE id=%s"
+WHERE id=%s;"
     schedule_params = (
         schedule.when,
         schedule.completed,
@@ -216,7 +224,7 @@ WHERE id=%s"
         logger.debug("Updating job: {}".format(job))
         if job.id:
             event_query = "UPDATE `events` SET executed=%s, executions=%s, \
-count=%s, started=%s, stopped=%s where id = %s"
+count=%s, started=%s, stopped=%s where id = %s;"
             event_params = (
                 job.executed,
                 job.executions,
@@ -268,7 +276,7 @@ def save(schedules):
             continue
         else:
             schedule_query = "INSERT INTO `schedules` \
-VALUES(%s, %s, %s, %s, %s)"
+VALUES(%s, %s, %s, %s, %s);"
             schedule_params = (
                 None,
                 schedule.when,
@@ -305,8 +313,8 @@ VALUES(%s, %s, %s, %s, %s)"
         for row in tmp_jobs:
             logger.debug("Inserting event: {}".format(row))
             event_query = "INSERT INTO `events` VALUES(%s, %s, %s, %s, %s, \
-%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            job_query = "INSERT INTO `jobs` VALUES(%s, %s)"
+%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            job_query = "INSERT INTO `jobs` VALUES(%s, %s);"
             try:
                 logger.debug("Inserting {} of type {} into events with query \
 {}".format(row, type(row), event_query))
@@ -416,7 +424,7 @@ in-memory invocation it should not even have this issue..."
                         remove_event_from_db(event.id)
                 conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
                 cursor = conn.cursor()
-                delete_query = "DELETE FROM `scedules` WHERE id=%s"
+                delete_query = "DELETE FROM `scedules` WHERE id=%s;"
                 delete_params = (schedule.id,)
                 try:
                     logger.info("Removing schedule id: {}".format(schedule.id))
@@ -436,11 +444,12 @@ def remove_event_from_db(event_id):
     """
     conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
     cursor = conn.cursor()
-    delete_query = "DELETE FROM `events` WHERE id=%s"
+    delete_query = "DELETE FROM `events` WHERE id=%s;"
     delete_params = (event_id,)
     try:
         logger.info("Removing event id: {}".format(event_id))
         cursor.execute(delete_query, delete_params)
+        # Good chance this doesn't work...
         logger.debug("Deleted {} Rows".format(cursor.rowcount))
     except Exception as e:
         logger.error(
