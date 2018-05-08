@@ -224,7 +224,7 @@ WHERE id=%s;"
         logger.debug("Updating job: {}".format(job))
         if job.id:
             event_query = "UPDATE `events` SET executed=%s, executions=%s, \
-count=%s, started=%s, stopped=%s where id = %s;"
+count=%s, started=%s, completed=%s where id = %s;"
             event_params = (
                 job.executed,
                 job.executions,
