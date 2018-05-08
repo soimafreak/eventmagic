@@ -403,8 +403,9 @@ def remove_schedule(schedules, schedule_uuid):
                 schedules.remove(schedule)
             except ValueError as e:
                 logger.error(
-                    "This should not happen, tried to remove {} from ".format(
-                        schedule
+                    "This should not happen, tried to remove {} from {}\
+".format(
+                        schedule, schedules
                     )
                 )
                 logger.debug(
@@ -414,6 +415,13 @@ in-memory invocation it should not even have this issue..."
                 )
                 for i in schedules:
                     logger.debug("Schedule: {}".format(i))
+                    for job in i.jobs:
+                        logger.debug("Jobs: {}".format(job))
+                for di in dupe_schedules:
+                    logger.debug("Dupe Schedule: {}".format(i))
+                    for djob in di.jobs:
+                        logger.debug("Dupe Jobs: {}".format(job))
+
             if schedule.id:
                 # Has an Entry in the DB
                 for event in schedule.jobs:
@@ -424,7 +432,7 @@ in-memory invocation it should not even have this issue..."
                         remove_event_from_db(event.id)
                 conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
                 cursor = conn.cursor()
-                delete_query = "DELETE FROM `scedules` WHERE id=%s;"
+                delete_query = "DELETE FROM `schedules` WHERE id=%s;"
                 delete_params = (schedule.id,)
                 try:
                     logger.info("Removing schedule id: {}".format(schedule.id))
