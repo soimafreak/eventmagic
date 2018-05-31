@@ -36,15 +36,21 @@ class Event(object):
         until it passes successfully
         """
         self.execute_function = execute_function
-        self.execute_params = kwargs.get("execute_params", {})
+        self.execute_params = kwargs.get(
+            "execute_params", {'args': [], 'kwargs': {}}
+        )
         self.executed = kwargs.get("executed")
         self.executions = kwargs.get("executions", 0)
         self.count = kwargs.get("count", 0)
         self.start_function = kwargs.get("start_function")
-        self.start_params = kwargs.get("start_params", {})
+        self.start_params = kwargs.get(
+            "start_params", {'args': [], 'kwargs': {}}
+        )
         self.started = kwargs.get("started")
         self.complete_function = kwargs.get("complete_function")
-        self.complete_params = kwargs.get("complete_params", {})
+        self.complete_params = kwargs.get(
+            "complete_params", {'args': [], 'kwargs': {}}
+        )
         self.completed = kwargs.get("completed", False)
         self.until_success = kwargs.get("until_success", False)
         self.uuid = kwargs.get("uuid", pyuuid.uuid4().hex)
@@ -89,11 +95,15 @@ class Event(object):
         :param function: The function to run
         :param params: The key word params to pass in
         """
-        logger.debug("Preparing to execute function: {}".format(
-            function.__name__
-        ))
+        logger.debug(
+            "Preparing to execute function: {} with params: {}".format(
+                function.__name__, params
+            )
+        )
         if isinstance(params, dict):
-            tmp_func = functools.partial(function, **params)
+            tmp_func = functools.partial(
+                function, *params['args'], **params['kwargs']
+            )
             return tmp_func()
         else:
             msg = "Params must be a dictionary"

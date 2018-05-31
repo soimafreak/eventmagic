@@ -39,9 +39,25 @@ def action():
     return True
 
 
+def action_args(pos1, pos2, named1='terry', named2='frank'):
+    """Take positional and named arguments."""
+    print("arg1: {} arg2: {} named1: {} named2: {}".format(
+        pos1, pos2, named1, named2
+    ))
+    return True
+
+
 # Creates a single schedulable item
 sched = Schedule()
 event = Event(action, until_success=True)
+positional = ['hello', 'world']
+named = {'named1': "bob"}
+event2 = Event(
+    action_args, execute_params={
+        'args': positional, 'kwargs': named
+    },
+    until_success=True
+)
 
 logger.debug("Event: {}".format(event))
 logger.debug("execute_funtion: {}\nCode: {}\nName: {}\nGlobals: {}".format(
@@ -49,7 +65,14 @@ logger.debug("execute_funtion: {}\nCode: {}\nName: {}\nGlobals: {}".format(
     event.execute_function.__name__, event.execute_function.__globals__
 ))
 
+logger.debug("Event2: {}".format(event))
+logger.debug("execute_funtion: {}\nCode: {}\nName: {}\nGlobals: {}".format(
+    event2.execute_function, event2.execute_function.__code__,
+    event2.execute_function.__name__, event2.execute_function.__globals__
+))
+
 sched.jobs = event
+sched.jobs = event2
 # If it's not an event object it becomes one but will have until_success=True
 # Set so it will only execute Once.
 sched.jobs = action
