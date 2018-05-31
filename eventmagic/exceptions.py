@@ -72,7 +72,13 @@ class GeneralEventsException(Exception):
 
 
 class FailedToLoadSchedules(Exception):
-    """Exception class for failure to laod schedules."""
+    """Exception class for failure to load schedules."""
+
+    pass
+
+
+class FailedToSaveSchedules(Exception):
+    """Exception class for failure to Save schedules."""
 
     pass
 

@@ -101,7 +101,13 @@ def get_schedules_from_db():
     logger.debug("Connecting to server: {}:{} with user {} using DB {}".format(
         HOST, PORT, USERNAME, DATABASE
     ))
-    conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
+    try:
+        conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
+    except mysql.connector.Error as e:
+        logger.error(
+            "There was a problem connecting to the database: {}".format(e)
+        )
+        raise exceptions.FailedToLoadSchedules(e)
     cursor = conn.cursor()
     logger.debug("Get the schedules from the DB")
     try:
@@ -261,7 +267,13 @@ def save(schedules):
 
     :param schedules: A list of schedule objects
     """
-    conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
+    try:
+        conn = db_connection(HOST, PORT, USERNAME, PASSWORD, DATABASE)
+    except mysql.connector.Error as e:
+        logger.error(
+            "There was a problem connecting to the database: {}".format(e)
+        )
+        exceptions.FailedToSaveSchedules(e)
     cursor = conn.cursor()
     logger.debug("Saving Schedules: {}".format(schedules))
     for schedule in schedules:
