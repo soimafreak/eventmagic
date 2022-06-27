@@ -43,7 +43,7 @@ i.e. AWS Lambda',
     packages=find_packages(exclude=['contrib', 'docs', 'tests', 'example.py']),
     install_requires=[
         'crontab==0.22.0',
-        'mysql-connector-python==8.0.11'
+        'mysql-connector-python==8.0.14'
     ],
 
     extras_require={
